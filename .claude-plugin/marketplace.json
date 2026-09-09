@@ -1,0 +1,21 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "slax57",
+  "description": "slax57's personal Claude Code configuration, packaged so it loads identically in a local terminal and in a cloud session",
+  "owner": {
+    "name": "slax57",
+    "email": "jb@marmelab.com"
+  },
+  "plugins": [
+    {
+      "name": "slax57-workflow",
+      "description": "Personal development workflow: terse output style, requirements grilling, PR description conventions, and the end-of-dev review pipeline",
+      "author": {
+        "name": "slax57",
+        "email": "jb@marmelab.com"
+      },
+      "category": "productivity",
+      "source": "./plugins/slax57-workflow"
+    }
+  ]
+}

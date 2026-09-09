@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "slax57-workflow",
+  "displayName": "slax57 Workflow",
+  "version": "0.1.0",
+  "description": "Personal development workflow: terse output style, requirements grilling, PR description conventions, and the end-of-dev review pipeline",
+  "author": {
+    "name": "slax57",
+    "email": "jb@marmelab.com"
+  },
+  "repository": "https://github.com/slax57/claude-config",
+  "keywords": ["workflow", "code-review", "pull-request", "output-style"]
+}
