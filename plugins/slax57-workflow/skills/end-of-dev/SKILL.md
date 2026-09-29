@@ -1,6 +1,6 @@
 ---
 name: end-of-dev
-description: End-of-development workflow to run AFTER the user has implemented and manually validated a feature. Commits the work, then runs three review lanes with disjoint mandates in parallel (the built-in code-review skill at xhigh, a report-only gaps subagent, a report-only security subagent), triages their findings (drop / fix autonomously / one batched arbitration), applies the fixes, then drafts the PR description and offers to push (never without approval). Use when the user signals the feature is validated and wants to wrap up ("c'est validé", "lance la fin de dev", "termine la feature", "ready to open the PR").
+description: End-of-development workflow to run AFTER the user has implemented and manually validated a feature. Commits the work, then runs three review lanes with disjoint mandates in parallel (the built-in code-review skill at xhigh, a report-only gaps subagent, a report-only security subagent), triages their findings (only certain, local, branch-introduced, non-nitpick fixes are applied automatically; everything else is put to the user one finding at a time), applies the fixes, then drafts the PR description and offers to push (never without approval). Use when the user signals the feature is validated and wants to wrap up ("c'est validé", "lance la fin de dev", "termine la feature", "ready to open the PR").
 ---
 
 # End-of-dev workflow
@@ -77,8 +77,9 @@ Common contract for both:
 > **Report only — do not edit, write, or commit anything.**
 > Ignore pre-existing problems outside the diff. No praise, no feature summary.
 > Return a flat list, worst first, max ~10 items, each on one line:
-> `SEVERITY | file:line | the claim in one sentence | suggested fix`
+> `SEVERITY | file:line | claim in one sentence | suggested fix(es) | confidence in the claim (high/medium/low) | introduced by this branch or pre-existing`
 > Only report what you can tie to a concrete failure or a concrete improvement.
+> A pre-existing defect is reported only when the diff touches or relies on it.
 > **Stay in your lane.** Anything outside your mandate belongs to another lane
 > that is already running — drop it, do not report it "just in case".
 
@@ -115,23 +116,36 @@ Wait for all three, then triage. Don't start editing while they run.
 
 ## 3. Triage
 
-Pool the three lanes' findings and sort every one into a bucket:
+Pool every finding and sort each into one bucket.
 
-- **Drop** — outside the diff, pre-existing, speculative with no failure
-  scenario, already the project's convention, a duplicate of another lane's
-  finding (lane 1 runs no verify pass at `xhigh`, so it deliberately keeps
-  uncertain candidates — expect some to drop here), or it contradicts a choice
-  the user **explicitly validated during this dev session** (common for lane 1,
-  which has no feature context: say so in one line rather than re-litigating).
-- **Fix** — clear, mechanical or unambiguous, no behaviour/scope change.
-- **Arbitrate** — a real trade-off, a behaviour or scope change, several valid
-  fixes, or a security finding whose fix is non-trivial.
+**Drop** — a false positive (check it against the code), speculative with no
+failure scenario, a duplicate of another lane's finding, already the project's
+convention, or contradicting a choice the user explicitly validated during this
+session (say so in one line rather than re-litigating).
 
-Then show **one** compact table (bucket / severity / file / claim, one line
-each) so the user can see what you dropped and re-classify if they disagree. If
-the Arbitrate bucket is non-empty, ask about all of it in a **single**
-`AskUserQuestion` with a recommended option per item. If it is empty, say so and
-keep going without asking.
+**Auto-fix** — only when **all five** hold:
+
+1. the finding is certain: you verified it in the code, it is not a hunch;
+2. the fix is certain: one obvious correct fix, no competing option;
+3. the defect was introduced by this branch — a pre-existing one may fall
+   outside the story's scope and needs a decision;
+4. the fix is local: no refactor, no change of structure, API or behaviour
+   beyond fixing the defect;
+5. it is not a nitpick: it has a concrete consequence (a bug, a broken
+   convention, a missing test, a leftover), not a matter of taste.
+
+**Arbitrate** — everything else.
+
+Then show **one** compact table — bucket / severity / file / claim, one line
+each — so the user can see what was dropped and what is fixed automatically,
+and re-classify any of it.
+
+Then put the Arbitrate bucket to the user, **one question per finding**, through
+`AskUserQuestion` (up to four questions per call, as many calls as needed, worst
+findings first). Each question states the finding and why it needs a decision
+(uncertain, several fixes, pre-existing, heavy, nitpick). Options: each
+plausible way to fix it, plus "Leave as is", with your recommendation first and
+labelled `(Recommended)`.
 
 ## 4. Apply and verify
 

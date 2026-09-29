@@ -4,7 +4,7 @@
   "description": "slax57's personal Claude Code configuration, packaged so it loads identically in a local terminal and in a cloud session",
   "owner": {
     "name": "slax57",
-    "email": "jb@marmelab.com"
+    "email": "14542336+slax57@users.noreply.github.com"
   },
   "plugins": [
     {
@@ -12,7 +12,7 @@
       "description": "Personal development workflow: terse output style, requirements grilling, PR description conventions, and the end-of-dev review pipeline",
       "author": {
         "name": "slax57",
-        "email": "jb@marmelab.com"
+        "email": "14542336+slax57@users.noreply.github.com"
       },
       "category": "productivity",
       "source": "./plugins/slax57-workflow"
