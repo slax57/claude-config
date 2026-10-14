@@ -10,6 +10,7 @@
 | `grill-me`             | `/grill-me` only                  | Alias that delegates to `grilling`                                                         |
 | `write-pr-description` | by the model                      | PR description structure, length ceiling, tone                                             |
 | `end-of-dev`           | `/end-of-dev`                     | Post-validation wrap-up: commit, three parallel review lanes, triage, fixes, PR draft      |
+| `prepare-demo`         | by the model, or `/prepare-demo`  | Sprint demo notes from the user's Trello cards, PRs and code, chained and timed            |
 
 ## MCP servers
 

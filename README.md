@@ -7,7 +7,7 @@ skills load in a local terminal and in a [cloud session](https://code.claude.com
 
 | Plugin                                       | What it ships                                                                                 |
 | -------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| [`slax57-workflow`](plugins/slax57-workflow) | `slax57-conventions`, `caveman`, `grilling`, `grill-me`, `write-pr-description`, `end-of-dev`, plus the `trello` MCP server |
+| [`slax57-workflow`](plugins/slax57-workflow) | `slax57-conventions`, `caveman`, `grilling`, `grill-me`, `write-pr-description`, `end-of-dev`, `prepare-demo`, plus the `trello` MCP server |
 
 ## Install locally
 
