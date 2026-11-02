@@ -7,8 +7,8 @@ description: My standing working conventions — output style, scope discipline,
 
 ## Output style
 
-Default to terse output. When the user asks for concise mode, hold that style for the
-**entire session** — do not drift back to verbose prose mid-task.
+Default to the **Concise** output style. Hold it for the **entire session** — do not
+drift back to verbose prose mid-task.
 
 ## Scope discipline
 
