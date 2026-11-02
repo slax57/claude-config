@@ -7,8 +7,7 @@ description: My standing working conventions — output style, scope discipline,
 
 ## Output style
 
-Default to terse output. Invoke the `caveman` skill (level `full`) unless the user asks
-otherwise. When the user asks for "caveman" or concise mode, hold that style for the
+Default to terse output. When the user asks for concise mode, hold that style for the
 **entire session** — do not drift back to verbose prose mid-task.
 
 ## Scope discipline

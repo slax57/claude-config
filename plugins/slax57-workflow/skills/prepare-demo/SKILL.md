@@ -39,7 +39,12 @@ Research only: tell them to change nothing. Brief each one with:
 - read the code to locate every entry point on each frontend the app has (if
   applicable: web pages and buttons, back-office screens, API endpoints), and
   the exact UI labels the audience will see;
-- read the seed data (fixtures, demo accounts) for what is usable as is;
+- read the seed data (fixtures, demo accounts) for what is usable as is; for
+  each seed record considered, say how to create it by hand and its
+  prerequisites (rights, dates, ids from an external system);
+- if the card is a fix (amounts, calculation, display, business rule): report
+  the behaviour **before and after**, with the exact case raised by the
+  product owner;
 - return, in the user's language: what was actually delivered vs the card;
   a concrete demo path (account, page, button, expected on-screen result);
   prerequisites (workers, schedulers, external systems, time of day); points to
@@ -71,13 +76,21 @@ preparation, and is named in the chat reply.
 - **Chain the data.** Each step reuses what a previous one created (import
   products, run a survey on them, order them…). Prefer creating data live over
   showing static seed data.
+- **Order:** group sections by domain or narrative thread (all "project"
+  sections together, all "Marketplace" sections together), never alternating.
+  Chained data first, then domain grouping; if the two conflict, flag it to the
+  user. Each part's title names its domain.
 - **Leave out** what is too complex, too slow, or too technical for the
   audience. A purely technical card (refactor, API cleanup) is a one-line talking
   point, unless it has a visible effect.
-- **Recommend a data strategy:** seed data as is, a dataset prepared the day
-  before, or data created live. Usually a mix: seed data for the background,
-  preparation for what must exist before step 1, live creation for everything
-  the demo is about.
+- **Data strategy:** by default, the preparation has the user **create by hand,
+  ahead of the demo**, the data needed (projects, products, quotes, orders,
+  accounts): it also rehearses the path and checks for regressions. Reloading
+  fixtures or the database is the exception: propose it only if it greatly
+  simplifies the setup, **ask the user first** (it erases existing data), and
+  make it the **first** preparation item, before any account or data creation.
+  No step relies on a seed record unless the user confirms it: it may have
+  changed since the last load.
 
 ## 5. Bake the demo-day traps into the preparation
 
@@ -96,12 +109,15 @@ the notes: turn each one into a preparation item or a step detail.
 - **Assign windows by mailbox.** The account receiving the emails runs in the
   **normal browser profile**, where the webmail is open, so clicking a link in a
   mail lands in the app, logged in as the right user. Other accounts go in
-  private windows or another browser. Label windows A, B, C… and keep them stable
-  across the notes.
+  private windows or another browser. Name each window after its role or
+  account ("Admin", "PV e-mail", "Chef projet client"), never A, B, C; keep the
+  names stable across the notes. Give each window's browser and mode (normal or
+  private): two private windows of the same browser share their session, so
+  they cannot hold two accounts.
 - **Short-lived tokens** (JWT, signed links) are fetched **during** the demo,
   never in the preparation.
-- **Relative dates in seed data.** Reload it the morning of the demo, or dates
-  have drifted.
+- **Relative dates in seed data.** Dates drift: prefer data created by hand
+  (see §4).
 - **Asynchronous processing.** Anything behind a queue, worker or scheduler: the
   preparation checks the worker runs, and the step says to refresh.
 - **Batch triggers** (an admin button running a scheduled job): click once, or
@@ -128,26 +144,38 @@ Each line says the feature, the action, or what to point out.
 
 Structure:
 
-1. **Préparation / Preparation**: numbered checklist. Environment reset, accounts
-   to create (with their attachments), files to prepare (give their full
-   content, e.g. one table per import file: a valid one and one with deliberate
-   errors, each error line annotated with the expected message), ids to note,
-   backups, browser windows (A, B, C… with the account in each), rehearsal items.
+1. **Préparation / Preparation**: numbered checklist. Fixtures reload (only if
+   agreed, first), accounts to create (with their attachments and rights), data
+   to create by hand (per item: numbered click path with exact labels, account
+   and rights, values to enter, ids to note and where to read them), files to
+   prepare (give their full content, e.g. one table per import file: a valid one
+   and one with deliberate errors, each error line annotated with the expected
+   message; for any file or payload to send, its template with the fields to
+   fill), backups, browser windows (explicit name, account, browser, mode),
+   rehearsal items.
 2. **Déroulé / Walkthrough**, total duration in the heading. One section per
-   feature or story, with its duration. Inside: numbered steps prefixed with the
-   window (`A :`), sub-bullets for what appears on screen, and a final
+   feature or story, with its duration, grouped by domain (title names it).
+   Inside: numbered steps prefixed with the window name (`Admin :`, same names
+   throughout), sub-bullets for what appears on screen, and a final
    **"À dire" / "Say"** list with the business points to highlight (rules
    enforced, effort saved, deviations agreed with the product owner, what comes
    next).
 
+For a fix: steps give the exact elements to show for the **after** (values,
+screen, labels); "Say" gives the **before** (wrong value or behaviour, with its
+figures if an amount). Amounts are consistent with each other (breakdown of a
+total, lines, sum). When the demo must display precise values, give the input
+values as a table. Demo values are copy-pasteable as is.
+
 No "pitfalls" section, no recap of the research, no implementation detail the
 audience cannot see.
 
-Chat reply around the notes: one line on coverage (cards included, cards left
-out and why), the rehearsal items, and nothing else.
+Chat reply around the notes: one short line on coverage (cards included, cards
+left out and why), then the rehearsal items, each with what could not be
+verified statically, and nothing else.
 
 ## 7. Iterate
 
 The user will reorder, swap accounts, or add steps. Apply the change throughout
-(window labels, accounts, data reused downstream), re-check any new assumption
+(window names, accounts, data reused downstream), re-check any new assumption
 in the code, and send the whole notes again as one code block.
