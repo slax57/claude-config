@@ -3,7 +3,7 @@ import type { MockClock, TestBody } from 'claude-code/testing'
 import type { On } from 'claude-code'
 
 import { normalizeRemote } from '../hooks/dev-notes/data'
-import { initialContent } from '../hooks/dev-notes/markdown'
+import { displayText, escapeText, initialContent } from '../hooks/dev-notes/markdown'
 import { DATA_SOURCE_ID, DATABASE_ID, FakeNotion } from './fake-notion'
 
 const PLUGIN = 'slax57-workflow'
@@ -113,6 +113,13 @@ test('remotes are normalized to owner/repo', async () => {
   expect(normalizeRemote('https://github.com/slax57/claude-config')).toBe('slax57/claude-config')
   expect(normalizeRemote('https://token@github.com/slax57/claude-config.git/')).toBe('slax57/claude-config')
   expect(normalizeRemote('http://local_proxy@127.0.0.1:1234/git/slax57/claude-config')).toBe('slax57/claude-config')
+})
+
+test("item text survives Notion's escaping", async () => {
+  // What Notion returned for an escaped write: it keeps every escape but `\>`.
+  const stored = 'a \\*b\\* \\<c> \\[d\\] e\\_f \\$g \\`h\\` \\~i\\~'
+  expect(displayText(stored)).toBe('a *b* <c> [d] e_f $g `h` ~i~')
+  expect(displayText(escapeText('a *b* <c> [d] e_f $g `h` ~i~'))).toBe('a *b* <c> [d] e_f $g `h` ~i~')
 })
 
 test('an existing page is reused', OPTIONS, async ($, on) => {
