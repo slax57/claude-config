@@ -200,6 +200,7 @@ test('a missing connector toasts after its retries and throws nothing', OPTIONS,
   expect(toasts).toEqual(['Notes : connecteur Notion absent ou non connecté.'])
   const ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
   expect(await ui.find({ type: 'Text', text: /Connecteur Notion indisponible/ })).toBeDefined()
+  expect((await ui.find({ type: 'Text', text: /claude\.ai Notion :/ }))?.text).toBe('- claude.ai Notion : not connected')
   await ui.unmount()
 })
 

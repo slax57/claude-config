@@ -29,7 +29,8 @@ export type DevNotesPage = {
 }
 
 export type DevNotesView =
-  | { status: 'idle' | 'loading' | 'unconfigured' | 'no-repo' | 'detached' | 'unavailable' }
+  | { status: 'idle' | 'loading' | 'unconfigured' | 'no-repo' | 'detached' }
+  | { status: 'unavailable'; attempts: string[] }
   | { status: 'error'; message: string }
   | { status: 'ready'; page: DevNotesPage }
 

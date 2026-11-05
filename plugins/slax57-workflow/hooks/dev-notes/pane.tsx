@@ -27,7 +27,6 @@ const STATUS_TEXT: Record<string, string> = {
   unconfigured: 'Base Notion non configurée (notionDatabaseId).',
   'no-repo': 'Pas de dépôt git ici.',
   detached: 'HEAD détachée : pas de notes pour cette session.',
-  unavailable: 'Connecteur Notion indisponible.',
 }
 
 export function itemKey(section: string, index: number): string {
@@ -55,7 +54,16 @@ export function renderPane(
     return (
       <Box flexDirection="column" gap={1}>
         {toolbar}
-        <Text dimColor>{view.status === 'error' ? `Erreur : ${view.message}` : STATUS_TEXT[view.status]}</Text>
+        {view.status === 'error' && <Text dimColor>Erreur : {view.message}</Text>}
+        {view.status === 'unavailable' && (
+          <Box flexDirection="column">
+            <Text dimColor>Connecteur Notion indisponible. Serveurs essayés :</Text>
+            {view.attempts.map(attempt => (
+              <Text dimColor>- {attempt}</Text>
+            ))}
+          </Box>
+        )}
+        {view.status !== 'error' && view.status !== 'unavailable' && <Text dimColor>{STATUS_TEXT[view.status]}</Text>}
       </Box>
     )
   }

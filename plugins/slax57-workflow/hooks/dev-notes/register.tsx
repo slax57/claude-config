@@ -15,6 +15,7 @@ import {
   pickPage,
   resolveDatabase,
   resolveRepo,
+  textOf,
 } from './data'
 import type { GitPort, McpBlock, McpResult, NotionPort } from './data'
 import {
@@ -41,7 +42,7 @@ const MASK_TTL_MS = 60_000
 const STORE_KEY = 'devNotesMask'
 
 const view = atom({ plugin: 'slax57-workflow', key: 'notesView' } as const, { status: 'idle' } as DevNotesView, {
-  shape: 'notes-view-1',
+  shape: 'notes-view-2',
 })
 const ui = atom(
   { plugin: 'slax57-workflow', key: 'notesUi' } as const,
@@ -93,20 +94,23 @@ function gitPort($: EngineInterface): GitPort {
   }
 }
 
-async function detectServer($: EngineInterface): Promise<string | undefined> {
+/** The connected Notion server, probed by reading the database; else what each name answered. */
+async function detectServer($: EngineInterface): Promise<{ server: string } | { attempts: string[] }> {
   const known = (await read($, mask)).server
-  for (const server of known === null ? SERVER_CANDIDATES : [known, ...SERVER_CANDIDATES]) {
+  const attempts: string[] = []
+  for (const server of new Set(known === null ? SERVER_CANDIDATES : [known, ...SERVER_CANDIDATES])) {
     try {
-      const self = await notionCall($, server, 'notion-get-self', {})
-      if (!self.isError) {
-        return server
+      const probe = await notionCall($, server, 'notion-fetch', { id: databaseId })
+      if (!probe.isError) {
+        return { server }
       }
-    } catch {
-      // Not this name, or not connected yet.
+      attempts.push(`${server} : ${textOf(probe).slice(0, 160)}`)
+    } catch (error) {
+      attempts.push(`${server} : ${messageOf(error).slice(0, 160)}`)
     }
   }
 
-  return undefined
+  return { attempts }
 }
 
 async function saveMask($: EngineInterface, change: (current: DevNotesMask) => DevNotesMask) {
@@ -146,17 +150,18 @@ async function startup($: EngineInterface, attempt: number) {
   }
   await setView($, { status: 'loading' })
 
-  const server = await detectServer($)
-  if (server === undefined) {
+  const detected = await detectServer($)
+  if (!('server' in detected)) {
     if (attempt < ATTEMPTS) {
       $.clock.after(RETRY_MS * attempt, () => void startup($, attempt + 1))
       return
     }
-    await setView($, { status: 'unavailable' })
+    await setView($, { status: 'unavailable', attempts: detected.attempts })
     $.ui.toast('Notes : connecteur Notion absent ou non connecté.')
     return
   }
 
+  const { server } = detected
   try {
     const port = notionPort($, server)
     const database = await resolveDatabase(port, databaseId)
