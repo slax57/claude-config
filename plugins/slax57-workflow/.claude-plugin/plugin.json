@@ -2,7 +2,7 @@
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "slax57-workflow",
   "displayName": "slax57 Workflow",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Personal development workflow: terse output style, requirements grilling, PR description conventions, the end-of-dev review pipeline, sprint demo preparation, and the Trello MCP server",
   "author": {
     "name": "slax57",
@@ -16,5 +16,16 @@
     "output-style",
     "mcp",
     "trello"
-  ]
+  ],
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "notionDatabaseId": {
+      "type": "string",
+      "title": "Notion database ID",
+      "description": "ID or URL of the Notion database that holds one page per repo and branch",
+      "sensitive": false,
+      "required": false,
+      "default": ""
+    }
+  }
 }
