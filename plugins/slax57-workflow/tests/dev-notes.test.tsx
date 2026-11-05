@@ -28,7 +28,13 @@ const PANE = {
 type Git = { remote?: string; branch?: string; isRepo?: boolean }
 
 /** Stands for the engine: the Notion connector, git, toasts, the store and the clock. */
-function engine(on: On, notion: FakeNotion, git: Git = {}, servers: readonly string[] = ['claude.ai Notion']) {
+function engine(
+  on: On,
+  notion: FakeNotion,
+  git: Git = {},
+  servers: readonly string[] = ['claude.ai Notion'],
+  tools: readonly string[] = [],
+) {
   const toasts: string[] = []
   const answer = (server: string, tool: string, args: Record<string, unknown>) =>
     servers.includes(server) ? notion.handle(tool, args) : { content: [{ type: 'text', text: 'not connected' }], isError: true }
@@ -54,6 +60,7 @@ function engine(on: On, notion: FakeNotion, git: Git = {}, servers: readonly str
     toasts.push(e.text)
     return { value: undefined }
   })
+  on('tool.list', () => ({ value: tools.map(name => ({ name, description: '', mcp: name.startsWith('mcp__') })) }))
   on('command.register', () => ({ value: { command: 'notes' } }))
   on('ui.open', () => ({ value: { isPlaced: true } }))
   on('session.start', (_, e) => ({ cwd: e.cwd }))
@@ -215,6 +222,24 @@ test('a connector that answers late is found by a retry', OPTIONS, async ($, on)
   servers.push('claude.ai Notion')
   await clock.advance(3000)
   await clock.settle()
+
+  expect(toasts).toEqual([])
+  const ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
+  expect(await ui.find({ type: 'Text', text: /premier cas/ })).toBeDefined()
+  await ui.unmount()
+})
+
+const OPAQUE = '1f858bf8-ee67-41f5-bd82-027b04739d0f'
+
+test('a connector keyed by an opaque ID is found through the tool list', OPTIONS, async ($, on) => {
+  const notion = new FakeNotion()
+  notion.addPage('a/b', 'main', NOTES)
+  const { clock, toasts } = engine(on, notion, { remote: 'git@github.com:a/b.git' }, [OPAQUE], [
+    'Bash',
+    `mcp__${OPAQUE}__notion-search`,
+    `mcp__${OPAQUE}__notion-fetch`,
+  ])
+  await start($, clock)
 
   expect(toasts).toEqual([])
   const ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
@@ -394,6 +419,14 @@ test("the model's writes on the database are refused", OPTIONS, async ($, on) =>
   for (const call of calls) {
     expect(JSON.stringify(await $.tool.call(call))).toContain(NEUTRAL)
   }
+  expect(model.isReached).toBe(false)
+})
+
+test('the filter holds for a connector keyed by an opaque ID', OPTIONS, async ($, on) => {
+  const { page, model } = await ready($, on)
+  const ran = await $.tool.call({ tool: `mcp__${OPAQUE}__notion-fetch`, id: page.id })
+
+  expect(JSON.stringify(ran)).toContain(NEUTRAL)
   expect(model.isReached).toBe(false)
 })
 

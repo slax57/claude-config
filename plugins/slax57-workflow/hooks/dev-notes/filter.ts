@@ -17,8 +17,14 @@ export function splitToolName(tool: string): { server: string; name: string } | 
   return match === null ? undefined : { server: match[1] ?? '', name: match[2] ?? '' }
 }
 
+/**
+ * A Notion connector's tool, by its server's name or by its own: a connector
+ * can be keyed by an opaque ID (`mcp__1f858bf8-…__notion-fetch`).
+ */
 export function isNotionTool(tool: string): boolean {
-  return /notion/i.test(splitToolName(tool)?.server ?? '')
+  const parts = splitToolName(tool)
+
+  return parts !== undefined && (/notion/i.test(parts.server) || parts.name.startsWith('notion-'))
 }
 
 export function isAlwaysDenied(tool: string): boolean {

@@ -62,7 +62,7 @@ and branch, out of the model's reach.
 
 ### Prerequisites
 
-- The Notion connector, connected in the session (`claude.ai Notion` on Desktop).
+- The Notion connector, connected in the session. The mod finds it by its `notion-fetch` tool, whatever the server is named (an opaque ID on Desktop).
 - A Notion database with exactly these properties: `Name` (title), `Repo` (text),
   `Branch` (text).
 - Keep that database out of pages Claude reads often: its parent page stays readable, minus

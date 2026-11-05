@@ -94,11 +94,24 @@ function gitPort($: EngineInterface): GitPort {
   }
 }
 
+/** The servers whose tools include `notion-fetch`, by the spelling their tool names carry. */
+async function connectedNotionServers($: EngineInterface): Promise<string[]> {
+  try {
+    return (await $.tool.list()).flatMap(tool => {
+      const parts = tool.mcp ? splitToolName(tool.name) : undefined
+      return parts?.name === 'notion-fetch' ? [parts.server] : []
+    })
+  } catch {
+    return []
+  }
+}
+
 /** The connected Notion server, probed by reading the database; else what each name answered. */
 async function detectServer($: EngineInterface): Promise<{ server: string } | { attempts: string[] }> {
   const known = (await read($, mask)).server
+  const listed = await connectedNotionServers($)
   const attempts: string[] = []
-  for (const server of new Set(known === null ? SERVER_CANDIDATES : [known, ...SERVER_CANDIDATES])) {
+  for (const server of new Set([...(known === null ? [] : [known]), ...listed, ...SERVER_CANDIDATES])) {
     try {
       const probe = await notionCall($, server, 'notion-fetch', { id: databaseId })
       if (!probe.isError) {
