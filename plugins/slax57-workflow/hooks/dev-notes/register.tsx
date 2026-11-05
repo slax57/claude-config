@@ -157,7 +157,7 @@ async function startup($: EngineInterface, attempt: number) {
       return
     }
     await setView($, { status: 'unavailable', attempts: detected.attempts })
-    $.ui.toast('Notes : connecteur Notion absent ou non connecté.')
+    $.ui.toast(`Notes : connecteur Notion absent ou non connecté (${detected.attempts.join(' ; ')}).`)
     return
   }
 
