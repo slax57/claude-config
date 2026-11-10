@@ -5,8 +5,9 @@ description: How I write GitHub pull request descriptions — structure, length 
 
 # Writing PR descriptions
 
-Applies to the pull request **description**. Always write it in **English**, always inside a
-**Markdown code block** so I can copy-paste it into GitHub.
+Applies to the pull request **description**. Always write it in **English**. When you show it
+to me in the chat, put it inside a **Markdown code block** so I can copy-paste it into GitHub;
+the body of a PR you open yourself is plain Markdown.
 
 ## Golden rule
 
