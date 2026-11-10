@@ -20,7 +20,7 @@ prints nothing. A local terminal or Dev Container is therefore unaffected.
 
 ## Enable it in a project
 
-It ships with `slax57-workflow`, so the cloud session must load that plugin
+It ships with `slax57-workflow`: enable that plugin on claude.ai
 ([see the README](../../../README.md#enable-in-cloud-sessions)). Then commit a
 [`.preview`](#preview) file at the project's root, and define `TS_AUTHKEY` in the
 cloud environment (below).

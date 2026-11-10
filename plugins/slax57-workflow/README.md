@@ -4,7 +4,7 @@
 
 | Skill                  | Invoked                           | What it does                                                                               |
 | ---------------------- | --------------------------------- | ------------------------------------------------------------------------------------------ |
-| `slax57-conventions`   | by the model                      | Standing conventions: terse output, scope discipline, PR handling, requirements interviews |
+| `slax57-conventions`   | by the model                      | Standing conventions: terse output, scope discipline, requirements interviews              |
 | `grilling`             | by the model, or a "grill" phrase | Requirements interview run as a design tree, one round of `AskUserQuestion` at a time      |
 | `grill-me`             | `/grill-me` only                  | Alias that delegates to `grilling`                                                         |
 | `write-pr-description` | by the model                      | PR description structure, length ceiling, tone                                             |
@@ -25,6 +25,11 @@ services the project declares in a `.preview` file reachable from your own devic
 through your Tailscale tailnet.
 Without `TS_AUTHKEY`, it does nothing. Setup and usage:
 [docs/preview-tunnel.md](docs/preview-tunnel.md).
+
+## Branch naming in cloud sessions
+
+A second `SessionStart` hook, in cloud sessions only, asks Claude to rename a generated
+`claude/…` branch after the work being done before the first commit.
 
 ## MCP servers
 
