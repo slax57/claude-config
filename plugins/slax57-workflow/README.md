@@ -11,11 +11,20 @@
 | `end-of-dev`           | `/end-of-dev`                     | Post-validation wrap-up: commit, three parallel review lanes, triage, fixes, PR draft      |
 | `prepare-demo`         | by the model, or `/prepare-demo`  | Sprint demo notes from the user's Trello cards, PRs and code, chained and timed            |
 | `notion-notes`         | by the model, or `/notion-notes [branch]` | Creates or finds the Notion notes page for the repo and branch; URL only, never reads it |
+| `tunnel`               | `/tunnel` only                    | Starts or restarts the preview tunnel and answers with its URLs                            |
 
 `notion-notes` relies on the official Notion connector (claude.ai connectors), not on a
 server shipped here. It writes to the database named by `NOTION_NOTES_DATABASE` (its URL
 or id), which needs the properties `Name` (title), `Repo` (text) and `Branch` (text).
 Set it like the Trello credentials below, or in the cloud environment's variables.
+
+## Preview tunnel
+
+In a cloud session where `TS_AUTHKEY` is defined, a `SessionStart` hook makes the
+services the project declares in a `.preview` file reachable from your own devices,
+through your Tailscale tailnet. The `preview-tunnel` script is on the Bash tool's `PATH`.
+Without `TS_AUTHKEY`, it does nothing. Setup and usage:
+[docs/preview-tunnel.md](docs/preview-tunnel.md).
 
 ## MCP servers
 
