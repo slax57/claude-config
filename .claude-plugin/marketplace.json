@@ -16,6 +16,16 @@
       },
       "category": "productivity",
       "source": "./plugins/slax57-workflow"
+    },
+    {
+      "name": "preview-tunnel",
+      "description": "Makes the services of a Claude Code on the web session reachable from your own devices through your Tailscale tailnet",
+      "author": {
+        "name": "slax57",
+        "email": "14542336+slax57@users.noreply.github.com"
+      },
+      "category": "development",
+      "source": "./plugins/preview-tunnel"
     }
   ]
 }
