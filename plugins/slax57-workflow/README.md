@@ -26,6 +26,11 @@ through your Tailscale tailnet.
 Without `TS_AUTHKEY`, it does nothing. Setup and usage:
 [docs/preview-tunnel.md](docs/preview-tunnel.md).
 
+## Branch naming in cloud sessions
+
+A second `SessionStart` hook, in cloud sessions only, asks Claude to rename a generated
+`claude/…` branch after the work being done before the first commit.
+
 ## MCP servers
 
 `.mcp.json` ships one server, started automatically whenever the plugin is enabled.
