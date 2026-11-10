@@ -22,7 +22,7 @@ Set it like the Trello credentials below, or in the cloud environment's variable
 
 In a cloud session where `TS_AUTHKEY` is defined, a `SessionStart` hook makes the
 services the project declares in a `.preview` file reachable from your own devices,
-through your Tailscale tailnet. The `preview-tunnel` script is on the Bash tool's `PATH`.
+through your Tailscale tailnet.
 Without `TS_AUTHKEY`, it does nothing. Setup and usage:
 [docs/preview-tunnel.md](docs/preview-tunnel.md).
 

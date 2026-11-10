@@ -4,7 +4,7 @@ A Claude Code on the web session runs in a cloud container nobody can reach.
 The preview tunnel makes the services started in that container reachable from **your
 own devices**, through your Tailscale tailnet: a private network, no public URL.
 
-[`bin/preview-tunnel`](../bin/preview-tunnel) runs a Tailscale node in the
+[`skills/tunnel/scripts/preview-tunnel`](../skills/tunnel/scripts/preview-tunnel) runs a Tailscale node in the
 container (userspace networking: no root, no TUN), joins the tailnet, starts the
 services the project declares in a `.preview` file at its root and prints their
 URLs. It knows nothing about the project's stack: only ports and commands.
@@ -15,13 +15,13 @@ prints nothing. A local terminal or Dev Container is therefore unaffected.
 | Ships | What it does |
 | --- | --- |
 | `SessionStart` hook | starts the tunnel in the background and tells Claude how to use it |
-| `bin/preview-tunnel` | the script, on the `PATH` of the Bash tool |
+| `skills/tunnel/scripts/preview-tunnel` | the script; the hook gives Claude its absolute path |
 | `/tunnel` | starts or restarts the tunnel and answers with the URLs |
 
 ## Enable it in a project
 
-It ships with `slax57-workflow`: enable the plugin in the project's
-`.claude/settings.json` ([how](../../../README.md#enable-in-cloud-sessions)), commit a
+It ships with `slax57-workflow`, so the cloud session must load that plugin
+([see the README](../../../README.md#enable-in-cloud-sessions)). Then commit a
 [`.preview`](#preview) file at the project's root, and define `TS_AUTHKEY` in the
 cloud environment (below).
 
@@ -90,7 +90,7 @@ run reads the same `.preview` whatever its working directory.
 
 The hook's output, added to the session's context, tells Claude to:
 
-- give the user the URLs of `preview-tunnel url` whenever they want to see a
+- give the user the URLs `url` prints whenever they want to see a
   change, rather than describing `127.0.0.1`;
 - use `up`, `serve` and `down` to manage the services;
 - **never connect to the other machines of the tailnet**: the tunnel exists so
@@ -132,6 +132,8 @@ The container cannot reach its own tailnet address: tests driving a browser
 must start their own server on another port, never reuse the preview one.
 
 ## Subcommands
+
+`preview-tunnel` stands for the script's path, which the hook gives Claude.
 
 | Command | Effect |
 | --- | --- |

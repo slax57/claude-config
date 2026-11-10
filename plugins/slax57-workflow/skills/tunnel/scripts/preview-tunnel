@@ -10,6 +10,7 @@
 
 set -uo pipefail
 
+SELF=$(readlink -f "${BASH_SOURCE[0]}")
 STATE_DIR="${PREVIEW_STATE_DIR:-$HOME/.preview}"
 BIN_DIR="$STATE_DIR/bin"
 SERVICES_DIR="$STATE_DIR/services"
@@ -289,7 +290,7 @@ start_services() {
 }
 
 print_urls() {
-    read_tunnel_address || { echo "The tunnel is down: run preview-tunnel up." >&2; return 1; }
+    read_tunnel_address || { echo "The tunnel is down: run $SELF up." >&2; return 1; }
     local name port cwd cmd any="" down
     while IFS=$'\t' read -r name port cwd cmd; do
         any=1
@@ -313,11 +314,12 @@ report_urls() {
 
 cmd_hook() {
     printf '[%s] SessionStart: starting the tunnel in the background\n' "$(date '+%F %T')" >>"$LOG_FILE"
-    PREVIEW_DETACHED=1 setsid nohup bash "${BASH_SOURCE[0]}" up >>"$LOG_FILE" 2>&1 </dev/null &
+    PREVIEW_DETACHED=1 setsid nohup bash "$SELF" up >>"$LOG_FILE" 2>&1 </dev/null &
     cat <<EOF
 Preview tunnel starting in the background (log: $LOG_FILE): it exposes the services of this container on the user's Tailscale tailnet.
-- \`preview-tunnel url\` prints their URLs: give them to the user whenever they want to see a change, rather than describing 127.0.0.1.
-- \`preview-tunnel up\` (or /tunnel) starts or restarts the tunnel and every service of .preview; it is idempotent. \`preview-tunnel serve <port> -- '<command using \$PORT>'\` exposes one more service, restarted like the others after the container sleeps; \`preview-tunnel down\` stops the services.
+Run its subcommands as \`bash $SELF <subcommand>\`:
+- \`url\` prints their URLs: give them to the user whenever they want to see a change, rather than describing 127.0.0.1.
+- \`up\` (or /tunnel) starts or restarts the tunnel and every service of .preview; it is idempotent. \`serve <port> -- '<command using \$PORT>'\` exposes one more service, restarted like the others after the container sleeps; \`down\` stops the services.
 - Never connect to the other machines of the tailnet: the tunnel exists so the user reaches this container, never the other way round.
 EOF
 }
