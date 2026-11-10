@@ -7,8 +7,7 @@ skills load in a local terminal and in a [cloud session](https://code.claude.com
 
 | Plugin                                       | What it ships                                                                                 |
 | -------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| [`slax57-workflow`](plugins/slax57-workflow) | `slax57-conventions`, `grilling`, `grill-me`, `write-pr-description`, `end-of-dev`, `prepare-demo`, `notion-notes`, plus the `trello` MCP server |
-| [`preview-tunnel`](plugins/preview-tunnel)   | Reach a cloud session's app from your own devices through your Tailscale tailnet: a `SessionStart` hook, the `preview-tunnel` script and `/tunnel` |
+| [`slax57-workflow`](plugins/slax57-workflow) | `slax57-conventions`, `grilling`, `grill-me`, `write-pr-description`, `end-of-dev`, `prepare-demo`, `notion-notes`, `tunnel`, the `trello` MCP server and the preview tunnel hook |
 
 ## Install locally
 

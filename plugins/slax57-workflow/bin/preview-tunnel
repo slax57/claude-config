@@ -4,7 +4,7 @@
 # knows ports and commands, declared in the project's `.preview` file.
 #
 # Usage: preview-tunnel hook | up | serve <port> -- <command> | url | down
-# Documentation: https://github.com/slax57/claude-config/tree/main/plugins/preview-tunnel
+# Documentation: https://github.com/slax57/claude-config/blob/main/plugins/slax57-workflow/docs/preview-tunnel.md
 #
 # Every subcommand is a silent no-op (exit 0) when TS_AUTHKEY is undefined.
 

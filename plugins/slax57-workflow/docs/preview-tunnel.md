@@ -1,10 +1,10 @@
-# preview-tunnel
+# Preview tunnel
 
 A Claude Code on the web session runs in a cloud container nobody can reach.
-This plugin makes the services started in that container reachable from **your
+The preview tunnel makes the services started in that container reachable from **your
 own devices**, through your Tailscale tailnet: a private network, no public URL.
 
-[`bin/preview-tunnel`](bin/preview-tunnel) runs a Tailscale node in the
+[`bin/preview-tunnel`](../bin/preview-tunnel) runs a Tailscale node in the
 container (userspace networking: no root, no TUN), joins the tailnet, starts the
 services the project declares in a `.preview` file at its root and prints their
 URLs. It knows nothing about the project's stack: only ports and commands.
@@ -20,21 +20,10 @@ prints nothing. A local terminal or Dev Container is therefore unaffected.
 
 ## Enable it in a project
 
-Plugins enabled in `~/.claude/settings.json` do not reach a cloud session.
-Declare it in the project's `.claude/settings.json`:
-
-```json
-{
-  "extraKnownMarketplaces": {
-    "slax57": {
-      "source": { "source": "github", "repo": "slax57/claude-config" }
-    }
-  },
-  "enabledPlugins": { "preview-tunnel@slax57": true }
-}
-```
-
-Then commit a [`.preview`](#preview) file at the project's root.
+It ships with `slax57-workflow`: enable the plugin in the project's
+`.claude/settings.json` ([how](../../../README.md#enable-in-cloud-sessions)), commit a
+[`.preview`](#preview) file at the project's root, and define `TS_AUTHKEY` in the
+cloud environment (below).
 
 ## One-time setup, in the Tailscale admin console
 
