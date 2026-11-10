@@ -5,7 +5,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}/bin/preview-tunnel\" hook",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/skills/tunnel/scripts/preview-tunnel\" hook",
             "timeout": 10
           }
         ]

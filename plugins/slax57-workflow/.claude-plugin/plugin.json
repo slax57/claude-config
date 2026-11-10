@@ -2,7 +2,7 @@
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "slax57-workflow",
   "displayName": "slax57 Workflow",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "Personal development workflow: terse output style, requirements grilling, PR description conventions, the end-of-dev review pipeline, sprint demo preparation, Notion notes pages per branch, the Trello MCP server, and a Tailscale preview tunnel for cloud sessions",
   "author": {
     "name": "slax57",
