@@ -10,6 +10,10 @@
 | `write-pr-description` | by the model                      | PR description structure, length ceiling, tone                                             |
 | `end-of-dev`           | `/end-of-dev`                     | Post-validation wrap-up: commit, three parallel review lanes, triage, fixes, PR draft      |
 | `prepare-demo`         | by the model, or `/prepare-demo`  | Sprint demo notes from the user's Trello cards, PRs and code, chained and timed            |
+| `notion-notes`         | by the model, or `/notion-notes`  | Creates or finds the private Notion notes page for the current repo and branch; URL only, never reads it |
+
+`notion-notes` relies on the official Notion connector (claude.ai connectors), not on a
+server shipped here. Pages live in a `Claude dev notes` database, created on first use.
 
 ## MCP servers
 
