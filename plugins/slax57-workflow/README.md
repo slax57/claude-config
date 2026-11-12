@@ -10,7 +10,7 @@
 | `write-pr-description` | by the model                      | PR description structure, length ceiling, tone                                             |
 | `end-of-dev`           | `/end-of-dev`                     | Post-validation wrap-up: commit, three parallel review lanes, triage, fixes, PR draft      |
 | `prepare-demo`         | by the model, or `/prepare-demo`  | Sprint demo notes from the user's Trello cards, PRs and code, chained and timed            |
-| `notion-notes`         | by the model, or `/notion-notes [branch]` | Creates or finds the Notion notes page for the repo and branch; URL only, never reads it |
+| `notion-notes`         | by the model, or `/notion-notes [branch]` | Creates (titled after the Trello card) or finds the Notion notes page for the repo and branch; URL only, never reads it |
 
 `notion-notes` relies on the official Notion connector (claude.ai connectors), not on a
 server shipped here. It writes to the database named by `NOTION_NOTES_DATABASE` (its URL
