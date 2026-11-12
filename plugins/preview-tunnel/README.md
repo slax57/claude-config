@@ -1,10 +1,10 @@
-# Preview tunnel
+# preview-tunnel
 
 A Claude Code on the web session runs in a cloud container nobody can reach.
 The preview tunnel makes the services started in that container reachable from **your
 own devices**, through your Tailscale tailnet: a private network, no public URL.
 
-[`skills/tunnel/scripts/preview-tunnel`](../skills/tunnel/scripts/preview-tunnel) runs a Tailscale node in the
+[`preview-tunnel.sh`](skills/tunnel/scripts/preview-tunnel.sh) runs a Tailscale node in the
 container (userspace networking: no root, no TUN), joins the tailnet, starts the
 services the project declares in a `.preview` file at its root and prints their
 URLs. It knows nothing about the project's stack: only ports and commands.
@@ -15,13 +15,20 @@ prints nothing. A local terminal or Dev Container is therefore unaffected.
 | Ships | What it does |
 | --- | --- |
 | `SessionStart` hook | starts the tunnel in the background and tells Claude how to use it |
-| `skills/tunnel/scripts/preview-tunnel` | the script; the hook gives Claude its absolute path |
+| `skills/tunnel/scripts/preview-tunnel.sh` | the script; the hook gives Claude its absolute path |
 | `/tunnel` | starts or restarts the tunnel and answers with the URLs |
 
 ## Enable it in a project
 
-It ships with `slax57-workflow`: enable that plugin on claude.ai
-([see the README](../../../README.md#enable-in-cloud-sessions)). Then commit a
+Install the plugin from this marketplace:
+
+```bash
+claude plugin marketplace add slax57/claude-config
+claude plugin install preview-tunnel@slax57
+```
+
+For cloud sessions, enable it on claude.ai
+([see the README](../../README.md#enable-in-cloud-sessions)). Then commit a
 [`.preview`](#preview) file at the project's root, and define `TS_AUTHKEY` in the
 cloud environment (below).
 
@@ -63,7 +70,7 @@ DERP relays. It works, with a few tens of milliseconds of latency.
 
 ## How it runs
 
-The `SessionStart` hook calls `preview-tunnel hook`, which starts `up` in a
+The `SessionStart` hook calls `preview-tunnel.sh hook`, which starts `up` in a
 detached process and returns at once. `up`:
 
 1. installs the static `tailscale` and `tailscaled` binaries into
@@ -133,15 +140,15 @@ must start their own server on another port, never reuse the preview one.
 
 ## Subcommands
 
-`preview-tunnel` stands for the script's path, which the hook gives Claude.
+`preview-tunnel.sh` stands for the script's path, which the hook gives Claude.
 
 | Command | Effect |
 | --- | --- |
-| `preview-tunnel hook` | `up` in the background; meant for `SessionStart` |
-| `preview-tunnel up` | install, connect, start the services, print the URLs; idempotent |
-| `preview-tunnel serve <port> -- <command>` | expose one more service, outside `.preview`; it is recorded and restarted like the others. Quote `'$PORT'` so it expands at start-up |
-| `preview-tunnel url` | print the URLs |
-| `preview-tunnel down` | stop the managed services and forget the `serve` ones; the node stays on the tailnet |
+| `preview-tunnel.sh hook` | `up` in the background; meant for `SessionStart` |
+| `preview-tunnel.sh up` | install, connect, start the services, print the URLs; idempotent |
+| `preview-tunnel.sh serve <port> -- <command>` | expose one more service, outside `.preview`; it is recorded and restarted like the others. Quote `'$PORT'` so it expands at start-up |
+| `preview-tunnel.sh url` | print the URLs |
+| `preview-tunnel.sh down` | stop the managed services and forget the `serve` ones; the node stays on the tailnet |
 
 A service is identified by a `PREVIEW_SERVICE_ID` variable in its environment:
 `down` only kills processes carrying it, so a PID reused after a wake-up is never
@@ -161,7 +168,7 @@ Everything is under `~/.preview/`:
 ## Known limit
 
 If joining the tailnet fails at start-up, no service of `.preview` starts: run
-`preview-tunnel up` again, or start the server by hand.
+`preview-tunnel.sh up` again, or start the server by hand.
 
 ## Moving to Headscale
 

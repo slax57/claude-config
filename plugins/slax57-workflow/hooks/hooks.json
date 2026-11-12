@@ -5,11 +5,6 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}/skills/tunnel/scripts/preview-tunnel\" hook",
-            "timeout": 10
-          },
-          {
-            "type": "command",
             "command": "[ \"$CLAUDE_CODE_REMOTE\" = true ] || exit 0; b=$(git branch --show-current 2>/dev/null); case \"$b\" in claude/*) echo \"Cloud session: the branch $b has a generated name. Before the first commit, rename it after the work being done, in kebab-case and without the claude/ prefix (e.g. git branch -m marketplace-delivery-tracking), and push that name instead.\" ;; esac; exit 0",
             "timeout": 10
           }

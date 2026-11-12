@@ -73,21 +73,39 @@ git branch --show-current
   "params": ["<owner/repo>", "<branch>"]}}
 ```
 
-Found: take the first `url` and go to step 5. Several: also list the others'
-URLs in one line, as duplicates.
+Found: take the first `url` and go to step 6. Several: also list the others'
+URLs in one line, as duplicates. An existing page keeps its title.
 
-## 4. Create it
+## 4. Resolve the title
+
+Not found: the page is titled after the user story being worked on on that
+branch, so the user can find it again later. From what this session already
+knows, in this order:
+
+1. the name of the Trello card the user story comes from, verbatim;
+2. otherwise, a short description of the user story (a few words, in the
+   language the user speaks).
+
+Use only what is known to concern that branch: with a branch argument other
+than the current branch, the current task may be about something else.
+
+Neither is known: **do not create the page**. Ask the user for the Trello card
+(its URL or name) or a description of the user story, then resume at this step
+with the answer. Given a card URL, read the card's name through the Trello MCP
+server.
+
+## 5. Create it
 
 `notion-create-pages` with
 `parent: {"type": "data_source_id", "data_source_id": "<collection id>"}`,
 `allow_async: false`, and one page:
 
-- `properties`: `Name` = `<repo> · <branch>`, `Repo` = `<owner/repo>`,
+- `properties`: `Name` = `<title>` from step 4, `Repo` = `<owner/repo>`,
   `Branch` = `<branch>`;
 - `icon`: `📝`;
 - no `content`. The page is the user's; write nothing in it.
 
-## 5. Reply
+## 6. Reply
 
 Reply with the URL and nothing else, plus one line if the page was just
 created. Then carry on with whatever you were doing before. Do not open, fetch

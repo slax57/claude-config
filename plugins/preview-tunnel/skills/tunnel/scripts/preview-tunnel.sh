@@ -3,8 +3,8 @@
 # owner's tailnet, through a userspace Tailscale node. Stack-agnostic: it only
 # knows ports and commands, declared in the project's `.preview` file.
 #
-# Usage: preview-tunnel hook | up | serve <port> -- <command> | url | down
-# Documentation: https://github.com/slax57/claude-config/blob/main/plugins/slax57-workflow/docs/preview-tunnel.md
+# Usage: preview-tunnel.sh hook | up | serve <port> -- <command> | url | down
+# Documentation: https://github.com/slax57/claude-config/blob/main/plugins/preview-tunnel/README.md
 #
 # Every subcommand is a silent no-op (exit 0) when TS_AUTHKEY is undefined.
 
@@ -339,7 +339,7 @@ cmd_serve() {
     local port="${1:-}"
     shift || true
     [ "${1:-}" = -- ] && shift
-    [[ "$port" =~ ^[0-9]+$ ]] && [ "$#" -gt 0 ] || die "usage: preview-tunnel serve <port> -- <command>"
+    [[ "$port" =~ ^[0-9]+$ ]] && [ "$#" -gt 0 ] || die "usage: preview-tunnel.sh serve <port> -- <command>"
     local cmd="$*" name="port-$port"
     [[ "$cmd" != *$'\n'* ]] || die "the command must hold on one line"
 
@@ -395,7 +395,7 @@ main() {
         serve) shift; cmd_serve "$@" ;;
         url) print_urls ;;
         down) cmd_down ;;
-        *) echo "usage: preview-tunnel hook | up | serve <port> -- <command> | url | down" >&2; exit 2 ;;
+        *) echo "usage: preview-tunnel.sh hook | up | serve <port> -- <command> | url | down" >&2; exit 2 ;;
     esac
 }
 
