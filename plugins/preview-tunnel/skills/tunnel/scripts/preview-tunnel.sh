@@ -3,8 +3,8 @@
 # owner's tailnet, through a userspace Tailscale node. Stack-agnostic: it only
 # knows ports and commands, declared in the project's `.preview` file.
 #
-# Usage: preview-tunnel hook | up | serve <port> -- <command> | url | down
-# Documentation: https://github.com/slax57/claude-config/blob/main/plugins/slax57-workflow/docs/preview-tunnel.md
+# Usage: preview-tunnel.sh up | serve <port> -- <command> | url | down
+# Documentation: https://github.com/slax57/claude-config/blob/main/plugins/preview-tunnel/README.md
 #
 # Every subcommand is a silent no-op (exit 0) when TS_AUTHKEY is undefined.
 
@@ -41,8 +41,7 @@ log() {
     local line
     line="[$(date '+%F %T')] $*"
     printf '%s\n' "$line" >&2
-    # A detached run already sends stderr to the log file.
-    [ "${PREVIEW_DETACHED:-}" = 1 ] || printf '%s\n' "$line" >>"$LOG_FILE"
+    printf '%s\n' "$line" >>"$LOG_FILE"
 }
 
 die() {
@@ -61,7 +60,7 @@ port_open() {
 # Runs once per execution: every process started afterwards must close fd 9.
 take_lock() {
     exec 9>"$LOCK_FILE"
-    flock -w "$LOCK_TIMEOUT" 9 || die "another preview-tunnel run still holds $LOCK_FILE after ${LOCK_TIMEOUT}s"
+    flock -w "$LOCK_TIMEOUT" 9 || die "another preview-tunnel.sh run still holds $LOCK_FILE after ${LOCK_TIMEOUT}s"
 }
 
 # --- Tailscale --------------------------------------------------------------
@@ -305,24 +304,11 @@ print_urls() {
     [ -n "$any" ] || printf 'Tailnet node %s (%s), no service declared.\n' "${TUNNEL_NAME:-?}" "$TUNNEL_HOST"
 }
 
-# A detached run already writes stdout to the log file.
 report_urls() {
-    if [ "${PREVIEW_DETACHED:-}" = 1 ]; then print_urls; else print_urls | tee -a "$LOG_FILE"; fi
+    print_urls | tee -a "$LOG_FILE"
 }
 
 # --- Subcommands ------------------------------------------------------------
-
-cmd_hook() {
-    printf '[%s] SessionStart: starting the tunnel in the background\n' "$(date '+%F %T')" >>"$LOG_FILE"
-    PREVIEW_DETACHED=1 setsid nohup bash "$SELF" up >>"$LOG_FILE" 2>&1 </dev/null &
-    cat <<EOF
-Preview tunnel starting in the background (log: $LOG_FILE): it exposes the services of this container on the user's Tailscale tailnet.
-Run its subcommands as \`bash $SELF <subcommand>\`:
-- \`url\` prints their URLs: give them to the user whenever they want to see a change, rather than describing 127.0.0.1.
-- \`up\` (or /tunnel) starts or restarts the tunnel and every service of .preview; it is idempotent. \`serve <port> -- '<command using \$PORT>'\` exposes one more service, restarted like the others after the container sleeps; \`down\` stops the services.
-- Never connect to the other machines of the tailnet: the tunnel exists so the user reaches this container, never the other way round.
-EOF
-}
 
 cmd_up() {
     take_lock
@@ -339,7 +325,7 @@ cmd_serve() {
     local port="${1:-}"
     shift || true
     [ "${1:-}" = -- ] && shift
-    [[ "$port" =~ ^[0-9]+$ ]] && [ "$#" -gt 0 ] || die "usage: preview-tunnel serve <port> -- <command>"
+    [[ "$port" =~ ^[0-9]+$ ]] && [ "$#" -gt 0 ] || die "usage: preview-tunnel.sh serve <port> -- <command>"
     local cmd="$*" name="port-$port"
     [[ "$cmd" != *$'\n'* ]] || die "the command must hold on one line"
 
@@ -371,16 +357,14 @@ cmd_down() {
     rm -f "$ADHOC_FILE"
 }
 
-# The hook receives CLAUDE_PROJECT_DIR, the Bash tool does not: the hook records
-# it, so a manual run reads the same .preview from any working directory.
+# `up` records the project it started, so the other subcommands read the same
+# .preview whatever their working directory.
 resolve_project_dir() {
-    if [ -n "${CLAUDE_PROJECT_DIR:-}" ]; then
-        PROJECT_DIR="$CLAUDE_PROJECT_DIR"
-        printf '%s\n' "$PROJECT_DIR" >"$PROJECT_FILE"
-    elif [ -s "$PROJECT_FILE" ] && [ -d "$(cat "$PROJECT_FILE")" ]; then
+    if [ "$1" != up ] && [ -s "$PROJECT_FILE" ] && [ -d "$(cat "$PROJECT_FILE")" ]; then
         PROJECT_DIR=$(cat "$PROJECT_FILE")
     else
-        PROJECT_DIR=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+        PROJECT_DIR="${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
+        [ "$1" != up ] || printf '%s\n' "$PROJECT_DIR" >"$PROJECT_FILE"
     fi
     CONFIG_FILE="$PROJECT_DIR/.preview"
 }
@@ -388,14 +372,13 @@ resolve_project_dir() {
 main() {
     [ -n "${TS_AUTHKEY:-}" ] || exit 0
     mkdir -p "$STATE_DIR" "$SERVICES_DIR"
-    resolve_project_dir
+    resolve_project_dir "${1:-}"
     case "${1:-}" in
-        hook) cmd_hook ;;
         up) cmd_up ;;
         serve) shift; cmd_serve "$@" ;;
         url) print_urls ;;
         down) cmd_down ;;
-        *) echo "usage: preview-tunnel hook | up | serve <port> -- <command> | url | down" >&2; exit 2 ;;
+        *) echo "usage: preview-tunnel.sh up | serve <port> -- <command> | url | down" >&2; exit 2 ;;
     esac
 }
 

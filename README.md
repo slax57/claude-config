@@ -5,21 +5,23 @@ skills load in a local terminal and in a [cloud session](https://code.claude.com
 
 ## Plugins
 
-| Plugin                                       | What it ships                                                                                 |
-| -------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| [`slax57-workflow`](plugins/slax57-workflow) | `slax57-conventions`, `grilling`, `grill-me`, `write-pr-description`, `end-of-dev`, `prepare-demo`, `notion-notes`, `tunnel`, the `trello` MCP server and the preview tunnel hook |
+| Plugin                                       | What it ships                                                                                                                         |
+| -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| [`slax57-workflow`](plugins/slax57-workflow) | `slax57-conventions`, `grilling`, `grill-me`, `write-pr-description`, `end-of-dev`, `prepare-demo`, `notion-notes`, the `trello` MCP server |
+| [`preview-tunnel`](plugins/preview-tunnel)   | `/tunnel`: exposes a cloud session's services on your Tailscale tailnet                                                                |
 
 ## Install locally
 
 ```bash
 claude plugin marketplace add slax57/claude-config
 claude plugin install slax57-workflow@slax57
+claude plugin install preview-tunnel@slax57
 ```
 
 ## Enable in cloud sessions
 
-Enable `slax57-workflow` on claude.ai, in the *Customize* section of Claude Code. Each new
-cloud session then syncs it into `~/.claude/plugins/synced/`, hooks and MCP servers
+Enable the plugins on claude.ai, in the *Customize* section of Claude Code. Each new
+cloud session then syncs them into `~/.claude/plugins/synced/`, hooks and MCP servers
 included.
 
 - A plugin hosted on claude.ai may not ship a top-level `bin/` directory: claude.ai
