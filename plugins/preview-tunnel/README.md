@@ -9,14 +9,14 @@ container (userspace networking: no root, no TUN), joins the tailnet, starts the
 services the project declares in a `.preview` file at its root and prints their
 URLs. It knows nothing about the project's stack: only ports and commands.
 
-The tunnel starts only on demand, with `/tunnel`. Without `TS_AUTHKEY`, it is
-inactive: every subcommand exits 0 and prints nothing. A local terminal or Dev
-Container is therefore unaffected.
+Without `TS_AUTHKEY`, the whole thing is inactive: every subcommand exits 0 and
+prints nothing. A local terminal or Dev Container is therefore unaffected.
 
 | Ships | What it does |
 | --- | --- |
-| `/tunnel` | starts or restarts the tunnel, answers with the URLs, and tells Claude how to manage it for the rest of the session |
-| `skills/tunnel/scripts/preview-tunnel.sh` | the script; `/tunnel` gives Claude its absolute path |
+| `SessionStart` hook | starts the tunnel in the background and tells Claude how to use it |
+| `skills/tunnel/scripts/preview-tunnel.sh` | the script; the hook gives Claude its absolute path |
+| `/tunnel` | starts or restarts the tunnel and answers with the URLs |
 
 ## Enable it in a project
 
@@ -70,7 +70,8 @@ DERP relays. It works, with a few tens of milliseconds of latency.
 
 ## How it runs
 
-`/tunnel` runs `preview-tunnel.sh up`, which:
+The `SessionStart` hook calls `preview-tunnel.sh hook`, which starts `up` in a
+detached process and returns at once. `up`:
 
 1. installs the static `tailscale` and `tailscaled` binaries into
    `~/.preview/bin` (first run only);
@@ -79,28 +80,26 @@ DERP relays. It works, with a few tens of milliseconds of latency.
 3. joins the tailnet as `claude-<branch>` unless it is already connected. The
    name is computed once and stored in `~/.preview/hostname`, so a woken-up
    container comes back under the same name;
-4. waits for a running `npm install` to finish (5 minutes max), then starts
-   every service whose port is not listening yet, and waits until it is (90 s
-   max);
+4. waits for a running `npm install` to finish (the cloud runs one at start-up,
+   5 minutes max), then starts every service whose port is not listening yet,
+   and waits until it is (90 s max);
 5. prints the URLs.
 
 The container falls asleep after about 10 minutes of inactivity: processes die,
-files stay. Nothing restarts the tunnel on wake-up: run `/tunnel` again, and
-everything above restarts from the state kept in `~/.preview`. A `flock` on
-`~/.preview/lock` keeps two runs from overlapping.
+files stay, and `SessionStart` fires again on wake-up. Everything above restarts
+from the state kept in `~/.preview`. A `flock` on `~/.preview/lock` keeps the
+hook and a manual `up` from running together.
 
-`up` records the project directory (the git root of its working directory) in
-`~/.preview/project`, so the other subcommands read the same `.preview`
-whatever their working directory.
+The hook also records the project directory in `~/.preview/project`, so a manual
+run reads the same `.preview` whatever its working directory.
 
 ## Instructions given to Claude
 
-`/tunnel` tells Claude, for the rest of the session, to:
+The hook's output, added to the session's context, tells Claude to:
 
 - give the user the URLs `url` prints whenever they want to see a
   change, rather than describing `127.0.0.1`;
-- use `up`, `serve` and `down` to manage the services, and `up` again after the
-  container woke up;
+- use `up`, `serve` and `down` to manage the services;
 - **never connect to the other machines of the tailnet**: the tunnel exists so
   the user reaches the container, never the other way round.
 
@@ -122,9 +121,8 @@ containers); otherwise the start fails with the end of the service log.
 
 Without `.preview`, `up` only joins the tailnet.
 
-A service whose port is already listening (started by the project's own
-`SessionStart` hook, say) is left alone, and does not receive the variables
-below.
+A project whose own `SessionStart` hook already starts its server should skip
+that start when `TS_AUTHKEY` is defined, and leave it to the tunnel.
 
 ### Variables given to each command
 
@@ -142,10 +140,11 @@ must start their own server on another port, never reuse the preview one.
 
 ## Subcommands
 
-`preview-tunnel.sh` stands for the script's path, which `/tunnel` gives Claude.
+`preview-tunnel.sh` stands for the script's path, which the hook gives Claude.
 
 | Command | Effect |
 | --- | --- |
+| `preview-tunnel.sh hook` | `up` in the background; meant for `SessionStart` |
 | `preview-tunnel.sh up` | install, connect, start the services, print the URLs; idempotent |
 | `preview-tunnel.sh serve <port> -- <command>` | expose one more service, outside `.preview`; it is recorded and restarted like the others. Quote `'$PORT'` so it expands at start-up |
 | `preview-tunnel.sh url` | print the URLs |
@@ -168,8 +167,8 @@ Everything is under `~/.preview/`:
 
 ## Known limit
 
-If joining the tailnet fails, no service of `.preview` starts: run `/tunnel`
-again, or start the server by hand.
+If joining the tailnet fails at start-up, no service of `.preview` starts: run
+`preview-tunnel.sh up` again, or start the server by hand.
 
 ## Moving to Headscale
 

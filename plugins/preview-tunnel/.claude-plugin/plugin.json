@@ -2,7 +2,7 @@
   "name": "preview-tunnel",
   "displayName": "Preview Tunnel",
   "version": "1.0.0",
-  "description": "Makes the services of a Claude Code cloud session reachable from your own devices, through your Tailscale tailnet, on demand with /tunnel",
+  "description": "Makes the services of a Claude Code cloud session reachable from your own devices, through your Tailscale tailnet",
   "author": {
     "name": "slax57",
     "email": "14542336+slax57@users.noreply.github.com"
