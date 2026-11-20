@@ -2,15 +2,15 @@
 
 ## Skills
 
-| Skill                  | Invoked                           | What it does                                                                               |
-| ---------------------- | --------------------------------- | ------------------------------------------------------------------------------------------ |
-| `slax57-conventions`   | by the model                      | Standing conventions: terse output, scope discipline, Git history, requirements interviews |
-| `grilling`             | by the model, or a "grill" phrase | Requirements interview run as a design tree, one round of `AskUserQuestion` at a time      |
-| `grill-me`             | `/grill-me` only                  | Alias that delegates to `grilling`                                                         |
-| `write-pr-description` | by the model                      | PR description structure, length ceiling, tone                                             |
-| `end-of-dev`           | `/end-of-dev`                     | Post-validation wrap-up: commit, three parallel review lanes, triage, fixes, PR draft      |
-| `prepare-demo`         | by the model, or `/prepare-demo`  | Sprint demo notes from the user's Trello cards, PRs and code, chained and timed            |
-| `notion-notes`         | by the model, or `/notion-notes [branch]` | Creates (titled after the Trello card) or finds the Notion notes page for the repo and branch; URL only, never reads it |
+| Skill                  | Invoked                                                         | What it does                                                                                                                            |
+| ---------------------- | --------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `slax57-conventions`   | by the model                                                    | Standing conventions: terse output, scope discipline, Git history, requirements interviews                                              |
+| `grilling`             | by the model, or a "grill" phrase                               | Requirements interview run as a design tree, one round of `AskUserQuestion` at a time                                                   |
+| `grill-me`             | `/grill-me` only                                                | Alias that delegates to `grilling`                                                                                                      |
+| `write-pr-description` | by the model                                                    | PR description structure, length ceiling, tone                                                                                          |
+| `end-of-dev`           | `/end-of-dev`                                                   | Post-validation wrap-up: commit, three parallel review lanes, triage, fixes, PR draft                                                   |
+| `prepare-demo`         | by the model, or `/prepare-demo`                                | Sprint demo notes from the user's Trello cards, PRs and code, chained and timed                                                         |
+| `notion-notes`         | by the model, or `/notion-notes [branch \| URL \| description]` | Creates or finds the Notion notes page for the repo and branch (named from a card or description if none yet); URL only, never reads it |
 
 `notion-notes` relies on the official Notion connector (claude.ai connectors), not on a
 server shipped here. It writes to the database named by `NOTION_NOTES_DATABASE` (its URL
